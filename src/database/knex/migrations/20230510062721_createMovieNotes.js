@@ -3,7 +3,7 @@ exports.up = knex => knex.schema.createTable("movieNotes", table => {
   table.increments("id");
   table.text("title");
   table.text("description");
-  table.integer("rating").min(0).max(5)
+  table.integer("rating")
   table.integer("user_id").references("id").inTable("users")
 
   
