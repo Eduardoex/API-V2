@@ -2,6 +2,7 @@ const {hash, compare} = require("bcryptjs")
 const AppError = require("../utils/AppError")
 const sqliteConnection = require("../database/sqlite")
 
+
 class UserController {
   async create(request, response){
     const {name, email, password} = request.body
@@ -23,6 +24,8 @@ const hashedPassword = await hash(password, 8)
     return response.status(201).json()
   }
 
+  
+
   async update(request, response){
     const {name, email, password, old_password} = request.body
     const {id} = request.params;
@@ -35,6 +38,9 @@ const hashedPassword = await hash(password, 8)
 
     }
 
+    
+    
+   
     const userWithUpdatedEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email])
     if (userWithUpdatedEmail && userWithUpdatedEmail.id !== user.id){
       throw new AppError("este email já esta em uso")
@@ -67,6 +73,10 @@ const hashedPassword = await hash(password, 8)
     return response.status(200).json();
   }
 }
+
+
+
+
 
 module.exports = UserController;
 
