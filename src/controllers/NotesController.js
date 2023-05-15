@@ -1,3 +1,5 @@
+//  movieNotesController esta dando um problema na rota então deixei notesController 
+
 const knex = require("../database/knex")
 const AppError = require("../utils/AppError")
 
@@ -43,6 +45,75 @@ class NotesController{
     await knex("movieTags").insert(movieTagsInsert)
 
     response.json()
+
+  }
+
+  async show(request, response ){
+    const {id} = request.params
+
+    const movieNotes = await knex("movieNotes").where({id}).first()
+    const movieTags = await knex("movieTags").where({note_id: id }).orderBy("name")
+
+
+    return response.json({...movieNotes,
+      movieTags})
+  }
+
+  async delete(request, response){
+    const{id} = request.params
+
+    await knex ("notes").where({id}).delete();
+
+    return response.json
+  }
+
+  
+
+  async index(request, response){
+    const { user_id, title, movieTags} = request.query
+
+    let movieNotes
+
+    if(movieTags){
+
+      const filterMovieTags = movieTags.split(",").map(movieTag => movieTag.trim())
+      
+      movieNotes = await knex("movieTags")
+      .select([
+        "movieNotes.id",
+        "movieNotes.title",
+        "movieNotes.user_id"
+      ])
+      .where("movieNotes.user_id", user_id)
+      .whereLike("movieNotes.title", `%${title}%`)
+      .whereIn("name", filterMovieTags)
+      .innerJoin("movieNotes", "movieNotes.id", "movieTags.note_id")
+      .orderBy("movieNotes.title")
+
+
+    }else{
+
+     movieNotes = await knex("movieNotes")
+    .where({user_id })
+    .whereLike("title", `%${title}%`)
+    .orderBy("title")
+    }
+    
+
+    const userTags = await knex("movieTags").where({user_id})
+    const NotesWithTags = movieNotes.map(movieNote => {
+      const noteTags = userTags.filter(movieTag => movieTag.movieNote_noteid === movieNotes.id)
+
+      return {
+        ...movieNote,
+        movieTags: noteTags
+      }
+    })
+
+    return response.json(NotesWithTags)
+
+
+
 
   }
 } 
