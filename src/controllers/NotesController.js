@@ -16,8 +16,11 @@ class NotesController{
     rating = Number(rating)
 
     
-
-    console.log(typeof(rating))
+    if(Number.isInteger(rating)){}
+    else{
+      throw new AppError("Seu numero deve ser inteiro")
+    }
+    
 
     if(rating <= 5 && rating >= 0){}
     else{
